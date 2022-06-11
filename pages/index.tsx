@@ -23,9 +23,10 @@ const Home: NextPage = () => {
     isError,
     error,
   } = useQuery<Post[], Error>('posts', getPosts, {
-    staleTime: 5 * 1000,
+    staleTime: 3 * 1000,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    refetchInterval: false,
   });
 
   if (isError) {
@@ -40,6 +41,10 @@ const Home: NextPage = () => {
 
         <Link href="/dependent">
           <a style={{ marginRight: '1rem' }}>Dependent Queries Page</a>
+        </Link>
+
+        <Link href="/paginated">
+          <a style={{ marginRight: '1rem' }}>Paginated Queries Page</a>
         </Link>
       </nav>
 
