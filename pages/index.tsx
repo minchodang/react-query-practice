@@ -49,6 +49,9 @@ const Home: NextPage = () => {
         <Link href="/infinity">
           <a style={{ marginRight: '1rem' }}>infinity Queries Page</a>
         </Link>
+        <Link href="/todos">
+          <a style={{ marginRight: '1rem' }}>Mutation Page</a>
+        </Link>
       </nav>
 
       <br />
