@@ -38,8 +38,13 @@ const TodosPage: NextPage = () => {
   });
 
   const { mutate } = useMutation(addTodo, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('todos');
+    onSuccess: (data) => {
+      queryClient.setQueryData<Todo[]>('todos', (oldData) => {
+        if (!oldData) {
+          return [];
+        }
+        return [...oldData, { id: data.id, todo: data.todo, done: false }];
+      });
     },
   });
 
