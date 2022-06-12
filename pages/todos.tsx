@@ -37,17 +37,38 @@ const TodosPage: NextPage = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { mutate } = useMutation(addTodo, {
-    onSuccess: (data) => {
+  const { mutate } = useMutation<
+    Todo,
+    Error,
+    string,
+    { previousTodos: Todo[] | undefined }
+  >(addTodo, {
+    onMutate: async (newTodo) => {
+      await queryClient.cancelQueries('todos');
+
+      const previousTodos = queryClient.getQueryData<Todo[]>('todos');
+
       queryClient.setQueryData<Todo[]>('todos', (oldData) => {
         if (!oldData) {
           return [];
         }
-        return [...oldData, { id: data.id, todo: data.todo, done: false }];
+
+        return [
+          ...oldData,
+          { id: oldData.length + 1, todo: newTodo, done: false },
+        ];
       });
+
+      return { previousTodos };
+    },
+
+    onError: (_error, _newTodo, context) => {
+      queryClient.setQueryData('todos', context?.previousTodos);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries('todos');
     },
   });
-
   const onSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -56,11 +77,6 @@ const TodosPage: NextPage = () => {
     },
     [mutate, todo]
   );
-
-  if (isError) {
-    return <div>{error.message}</div>;
-  }
-
   return (
     <>
       <form onSubmit={onSubmit}>
